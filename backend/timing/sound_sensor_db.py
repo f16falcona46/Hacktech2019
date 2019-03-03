@@ -34,7 +34,7 @@ def latlon_to_fake_xy(s):
 def add_reading_to_db(time, amplitude, lat, long, alt=0.0):
     global conn
     c = conn.cursor()
-    x, y, z = latlon_to_xyz(lat, long, alt)
+    x, y, z = latlong2ecef(lat, long, alt)
     c.execute("INSERT INTO Sensors (X, Y, Z, T, Amplitude) VALUES (?, ?, ?, ?, ?);", (x, y, z, query_to_time(time), amplitude))
     conn.commit()
 
