@@ -38,7 +38,7 @@ def add_reading_to_db(time, amplitude, lat, long, alt=0.0):
     c.execute("INSERT INTO Sensors (X, Y, Z, T, Amplitude) VALUES (?, ?, ?, ?, ?);", (x, y, z, query_to_time(time), amplitude))
     conn.commit()
 
-def add_event_to_db(time, z, y, z):
+def add_event_to_db(time, x, y, z):
     global conn
     c = conn.cursor()
     lat, lon, _ = pm.ecef2geodetic(x, y, z)
