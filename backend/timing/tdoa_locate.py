@@ -78,6 +78,13 @@ def run_test(receive_dist, noise, num_recs, n):
 
     return shuffle_tdoa_locate(locs, delays, n)
 
+def run_demo():
+    x = [run_test(10, 1, 10) for x in range(20)]
+    import matplotlib.pyplot as plt
+    x = [run_test(10, 1, 10)[0] for x in range(20)]
+    plt.plot(x)
+    plt.show()
+
 def generate_datapoints(loc):
     receiver_locs = []
     delays = []
@@ -94,13 +101,6 @@ def generate_datapoints(loc):
 
     return receiver_locs, delays
 
-
-def run_demo():
-    x = [run_test(10, 1, 10) for x in range(20)]
-    import matplotlib.pyplot as plt
-    x = [run_test(10, 1, 10)[0] for x in range(20)]
-    plt.plot(x)
-    plt.show()
 
 def test2(N):
     truelocs = [2. * (np.random.random(3) - 0.5) for i in range(N)] 
