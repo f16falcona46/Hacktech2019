@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from random import randrange
 
 def tdoa_locate(source_loc, dist):
@@ -78,7 +79,61 @@ def run_test(receive_dist, noise, num_recs, n):
     return shuffle_tdoa_locate(locs, delays, n)
 
 def run_demo():
+    x = [run_test(10, 1, 10) for x in range(20)]
     import matplotlib.pyplot as plt
     x = [run_test(10, 1, 10)[0] for x in range(20)]
     plt.plot(x)
     plt.show()
+
+def generate_datapoints(loc):
+    receiver_locs = []
+    delays = []
+
+    for i in range(10):
+        receiver_loc = 2.0 * (np.random.random(3) - 0.5)
+        deltaR = receiver_loc - loc
+        delay = np.linalg.norm(deltaR)
+        receiver_locs.append(receiver_loc)
+        delays.append(delay)
+    
+    receiver_locs = np.array(receiver_locs)
+    delays = np.array(delays)
+
+    return receiver_locs, delays
+
+
+def test2(N):
+    truelocs = [2. * (np.random.random(3) - 0.5) for i in range(N)] 
+    errs = []
+    receiver_locs = []
+    delay = []
+    
+    for i, trueloc in enumerate(truelocs):
+        receiver_locs, delay = generate_datapoints(trueloc)
+        predloc = tdoa_locate(receiver_locs, delay)
+        err = np.linalg.norm(predloc - trueloc)
+        errs.append(err)
+
+    errs = np.array(errs)
+    plt.figure(1)
+    plt.hist(errs)
+    plt.xlabel('Error = |true loc - pred loc|')
+    plt.ylabel('Frequency')
+    plt.savefig('errors.png')
+
+    plt.figure(2)
+    plt.scatter(receiver_locs[:,0], receiver_locs[:,1])
+    plt.title('Receiver Locations')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.savefig('reciever_locs.png')
+    
+    plt.figure(3)
+    plt.hist(delay)
+    plt.title('Delay')
+    plt.xlabel('Delay')
+    plt.ylabel('Frequency')
+    plt.savefig('delay.png')
+
+    plt.show()
+
