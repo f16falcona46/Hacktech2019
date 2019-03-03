@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta
 import numpy as np
+import pymap3d as pm
 
 dbfile = "sound_sensors.db"
 R_Earth = 3959 #Miles
@@ -17,12 +18,10 @@ def init():
 conn = init()
 
 def latlong2ecef(lat, long, alt):
-    #stub
-    return lat, long, alt
+    return pm.geodetic2ecef(lat, long, alt)
 
 def convtime(time):
-    #stub
-    return time
+    return datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
 
 def latlon_to_xy(s):
     s[:, 0] = R_Earth * np.sin(s[:, 0] / 180.0 * np.pi)
@@ -33,14 +32,12 @@ def add_reading_to_db(time, amplitude, lat, long, alt=0):
     global conn
     c = conn.cursor()
     #x, y, z = latlong2ecef(lat, long, alt)
-    t = convtime(time)
     c.execute("INSERT INTO Sensors (Lat, Lon, Alt, T, Amplitude) VALUES (?, ?, ?, ?, ?);", (lat, long, alt, t, amplitude))
     conn.commit()
 
 def add_event_to_db(time, lat, long):
     global conn
     c = conn.cursor()
-    t = convtime(time)
     c.execute("INSERT INTO Events (Lat, Lon, T) VALUES (?, ?, ?);", (lat, long, t))
     conn.commit()
 
@@ -67,8 +64,7 @@ def dump_for_delay():
     c = conn.cursor()
     sensors = []
     for row in c.execute("SELECT Lat, Lon, T FROM Sensors;"):
-        t = datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S.%f")
-        row = (row[0], row[1], (t - datetime(2019, 1, 1)) / timedelta(seconds=1) * V_Sound)
+        row = (row[0], row[1], (convtime(row[2]) - datetime(2019, 1, 1)) / timedelta(seconds=1) * V_Sound)
         sensors.append(row)
     sensors = np.array(sensors)
     sensors = latlon_to_xy(sensors)
