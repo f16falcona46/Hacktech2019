@@ -69,8 +69,11 @@ def dump_for_delay():
     global conn
     c = conn.cursor()
     sensors = []
+    t_first = None
     for row in c.execute("SELECT X, Y, Z, T FROM Sensors;"):
-        row = (row[0], row[1], row[2], (str_to_time(row[2]) - datetime(2019, 1, 1)) / timedelta(seconds=1) * V_Sound)
+        row = (row[0], row[1], row[2], (str_to_time(row[3]) - datetime(2019, 1, 1)) / timedelta(seconds=1) * V_Sound)
+        if not t_first:
+            t_first = str_to_time(row[3])
         sensors.append(row)
     sensors = np.array(sensors)
-    return sensors
+    return sensors, t_first
