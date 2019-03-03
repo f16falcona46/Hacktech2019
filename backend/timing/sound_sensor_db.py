@@ -52,11 +52,12 @@ def add_event_to_db(x, y, z, time, conn=conn):
     c.execute("INSERT INTO Events (Lat, Lon, T) VALUES (?, ?, ?);", (lat, lon, time))
     conn.commit()
 
-def clean_db(current_time=datetime.now(timezone.utc), offset=timedelta(seconds=-15), conn=conn):
+def clean_db(current_time=datetime.now(timezone.utc), offset_s=timedelta(seconds=-15), offset_e=timedelta(minutes=-2), conn=conn):
     c = conn.cursor()
-    t = (current_time + offset - datetime(1970, 1, 1, tzinfo=timezone.utc)) / timedelta(milliseconds=1)
-    c.execute("DELETE FROM Sensors WHERE (T < ?);", (t,))
-    c.execute("DELETE FROM Events WHERE (T < ?);", (t,))
+    t_s = (current_time + offset_s - datetime(1970, 1, 1, tzinfo=timezone.utc)) / timedelta(milliseconds=1)
+    t_e = (current_time + offset_e - datetime(1970, 1, 1, tzinfo=timezone.utc)) / timedelta(milliseconds=1)
+    c.execute("DELETE FROM Sensors WHERE (T < ?);", (t_s,))
+    c.execute("DELETE FROM Events WHERE (T < ?);", (t_e,))
     conn.commit()
 
 def dump_for_hotspot(conn=conn):

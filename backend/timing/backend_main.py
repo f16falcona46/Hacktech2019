@@ -17,7 +17,12 @@ def test_tdoa_goodness(conn):
         loc = s[:, :3]
         dist = s[:, 3]
         print(loc, dist)
-        x_s, acc = tdoa.shuffle_tdoa_locate(loc, dist, n // 2)
+        acc = min_acc + 1
+        x_s = None
+        try:
+            x_s, acc = tdoa.shuffle_tdoa_locate(loc, dist, n // 2)
+        except np.linalg.LinAlgError:
+            print("Oops! Singlular matrix; continuing!")
         print(acc)
         if acc < min_acc:
             print(x_s[0], x_s[1], x_s[2], t_first)
