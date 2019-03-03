@@ -12,6 +12,11 @@ def make_request_url(magnitude,latitude,longitude,time,altitude):
     URL = "https://jasonli.us/cgi-bin/hacktech2019.cgi?";
     URL = URL + "m=" + str(magnitude) + "&lat=" + str(latitude) + "&long=" + str(longitude) + "&t=" + str(time) + "&alt=" + str(altitude);
     return URL
+ 
+def get_lat_long_itude(low,high):
+    return random.uniform(low,high)
+def get_magnitude(low,high):
+    return random.uniform(low,high)
 
 url = make_request_url(0,0,0,0,0)
 r = requests.get(url)
