@@ -45,7 +45,7 @@ def add_event_to_db(time, x, y, z):
     c.execute("INSERT INTO Events (X, Y, Z, T) VALUES (?, ?, ?);", (lat, lon, t))
     conn.commit()
 
-def clean_db(current_time=datetime.now(tzinfo=timezone.utc), offset=timedelta(seconds=-15)):
+def clean_db(current_time=datetime.now(timezone.utc), offset=timedelta(seconds=-15)):
     global conn
     c = conn.cursor()
     t = current_time + offset
