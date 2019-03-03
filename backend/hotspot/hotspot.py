@@ -5,13 +5,47 @@ from mpl_toolkits.mplot3d import Axes3D as plt3d
 
 # Generate grid coordinates 
 def genCoords(N, xmin, xmax, ymin, ymax):
+    '''
+    Use this to generate meshgrid for interpolation.
+
+    Args
+        N - number of points
+        xmin, xmax - min and max of x coordinate
+        ymin, ymax - min and max of y coordinate
+
+    Returns
+        x_mesh, y_mesh from meshgrid
+    '''
     x = np.linspace(xmin, xmax, N)
     y = np.linspace(ymin, ymax, N)
     x_mesh, y_mesh = np.meshgrid(x, y)
 
     return x_mesh, y_mesh
 
-def findSource(x, y, amp, x_mesh, y_mesh, method):
+def findSource(x, y, amp, x_mesh, y_mesh, method='multiquadric'):
+    '''
+    Args
+        x, y - coordinates of receiver
+        amp - sound amplitude
+        x_mesh, y_mesh - gridded region to compute interpolation over
+        method - scipy.interpolate.rbf basis function
+
+    Returns
+        Tuple containing (
+                interpolated amplitudes, 
+                gradx, 
+                grady, 
+                max amplitude,
+                max amplitude location in (x, y),
+                max gradx,
+                max gradx location in (x, y),
+                max grady,
+                max grady location in (x, y)
+             )        
+
+        We only really need the max amplitude location in (x, y).
+        Unpack the tuple. 
+    '''
     # Create RBF interpolator instance
     rbfi = itpl.Rbf(x, y, amp, function=method, smooth=0)
 
