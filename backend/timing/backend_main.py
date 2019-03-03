@@ -4,16 +4,20 @@ import wsgiref.simple_server
 from urllib.parse import parse_qs
 import sound_sensor_db as sdb
 import tdoa_locate as tdoa
+from threading import Thread, Event
+import numpy as np
 
 min_acc = 20
 
-def test_tdoa_goodness():
-    s, t_first = sdb.dump_for_delay()
+def test_tdoa_goodness(conn):
+    s, t_first = sdb.dump_for_delay(conn)
     n = s.shape[0]
+    print(repr(s))
     if n >= 4:
         loc = s[:, :3]
         dist = s[:, 3]
-        x_s, acc = shuffle_tdoa_locate(loc, dist, n // 2)
+        x_s, acc = tdoa.shuffle_tdoa_locate(loc, dist, n // 2)
+        print(acc)
         if acc < min_acc:
             sdb.add_event_to_db(x_s[0], x_s[1], x_s[2], t_first)
 
@@ -26,9 +30,10 @@ class DbCleanerThread(Thread):
         self.stopped = event
     
     def run(self):
+        self.conn = sdb.newconn()
         while not self.stopped.wait(2.0):
-            sdb.clean_db()
-            test_tdoa_goodness()
+            sdb.clean_db(conn=self.conn)
+            test_tdoa_goodness(conn=self.conn)
 
 stop = Event()
 t = DbCleanerThread(stop)
